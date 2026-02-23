@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!--
+    news-id  : unique identifier for this news item (YYYY-MM-DD or any string).
+               The app reads this value BEFORE showing the page and compares it
+               with the last news-id it has already shown to the user.
+               If they match, the app skips showing the page; otherwise it shows
+               it and persists the new news-id locally.
+  -->
+  <meta name="news-id" content="2026-02-23">
+
+  <title>Novità – Venezia Marea</title>
+  <style>
+    :root {
+      --accent: #0057a8;
+      --accent-light: #e8f0fb;
+      --text: #111;
+      --muted: #555;
+      --bg: #ffffff;
+      --radius: 12px;
+      --tag-bg: #e8f0fb;
+      --tag-color: #0057a8;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.6;
+      margin: 0;
+      padding: 24px 16px 32px;
+      background: radial-gradient(circle at top, #e3f0ff 0, #ffffff 55%);
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .page {
+      max-width: 640px;
+      margin: 0 auto;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+    }
+
+    .app-name {
+      font-size: 0.85em;
+      font-weight: 600;
+      color: var(--accent);
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+
+    .lang-switcher {
+      display: flex;
+      gap: 6px;
+    }
+
+    .lang-switcher button {
+      background: none;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      padding: 3px 10px;
+      font-size: 0.78em;
+      cursor: pointer;
+      color: var(--muted);
+      transition: border-color 0.15s, color 0.15s;
+    }
+
+    .lang-switcher button.active {
+      border-color: var(--accent);
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .headline {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .news-date-tag {
+      display: inline-block;
+      background: var(--tag-bg);
+      color: var(--tag-color);
+      font-size: 0.78em;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 20px;
+      margin-bottom: 14px;
+      letter-spacing: 0.02em;
+    }
+
+    h1 {
+      font-size: 1.65em;
+      margin: 0;
+      line-height: 1.2;
+      color: #020817;
+      letter-spacing: -0.02em;
+    }
+
+    .news-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-top: 20px;
+    }
+
+    .news-card {
+      background: linear-gradient(145deg, #ffffff 0%, #f8fafd 100%);
+      border-radius: 18px;
+      padding: 18px 18px 18px 18px;
+      border: 1px solid rgba(15, 23, 42, 0.06);
+      box-shadow: 0 18px 45px rgba(15, 23, 42, 0.12);
+      position: relative;
+      overflow: hidden;
+      isolation: isolate;
+    }
+
+    .news-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at top left, rgba(0, 91, 197, 0.13), transparent 55%);
+      opacity: 0.9;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .news-card-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 999px;
+      padding: 3px 10px;
+      font-size: 0.72em;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      background: rgba(0, 87, 168, 0.08);
+      color: var(--accent);
+    }
+
+    .pill-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: #10b981;
+      box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.25);
+    }
+
+    .news-card h2 {
+      font-size: 1.05em;
+      margin: 0;
+      color: #020817;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+
+    .news-card p {
+      margin: 6px 0 0;
+      font-size: 0.94em;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .news-card + .news-card {
+      margin-top: 4px;
+    }
+
+    p {
+      margin: 0 0 14px;
+      color: var(--muted);
+    }
+
+    footer {
+      margin-top: 32px;
+      font-size: 0.82em;
+      color: #aaa;
+      text-align: center;
+    }
+
+    /* language sections */
+    [data-lang] { display: none; }
+    [data-lang].visible { display: block; }
+  </style>
+</head>
+<body>
+
+  <div class="page">
+    <header>
+      <span class="app-name">Venezia Marea</span>
+      <div class="lang-switcher">
+        <button id="btn-it" onclick="setLang('it')">IT</button>
+        <button id="btn-en" onclick="setLang('en')">EN</button>
+      </div>
+    </header>
+
+    <!-- ═══════════════════════════════════════════
+         ITALIAN CONTENT
+    ════════════════════════════════════════════ -->
+    <div data-lang="it">
+      <div class="headline">
+        <span class="news-date-tag">23 febbraio 2026</span>
+        <span style="font-size: 0.8em; color: var(--muted);">Aggiornamenti sull'app</span>
+      </div>
+      <h1>Le ultime novità di Venezia Marea</h1>
+
+      <div class="news-list">
+        <div class="news-card">
+          <div class="news-card-header">
+            <div class="pill">
+              <span class="pill-dot"></span>
+              <span>Nuovo</span>
+            </div>
+            <h2>Venezia Marea è ora disponibile su iOS</h2>
+          </div>
+          <p>
+            Porta le previsioni di marea direttamente sul tuo iPhone. Interfaccia ottimizzata,
+            notifiche affidabili e una mappa pensata per muoverti in sicurezza in città.
+          </p>
+          <div style="margin-top: 14px; border-radius: 14px; overflow: hidden;">
+            <video
+              src="assets/venezia_marea_ios_available.mp4"
+              autoplay
+              muted
+              playsinline
+              style="width: 100%; height: auto; display: block; background: #000;"
+            ></video>
+          </div>
+        </div>
+
+        <div class="news-card">
+          <div class="news-card-header">
+            <div class="pill">
+              <span class="pill-dot"></span>
+              <span>Miglioria</span>
+            </div>
+            <h2>Previsioni marea ancora più precise</h2>
+          </div>
+          <p>
+            Abbiamo aggiornato il motore di previsione: i dati sono ora più accurati e
+            vengono aggiornati ogni ora grazie alle nuove API del Comune di Venezia.
+          </p>
+        </div>
+
+        <div class="news-card">
+          <div class="news-card-header">
+            <div class="pill">
+              <span class="pill-dot"></span>
+              <span>Funzione</span>
+            </div>
+            <h2>Notifiche personalizzabili</h2>
+          </div>
+          <p>
+            Scegli la soglia di allerta (in centimetri) oltre la quale vuoi ricevere una notifica
+            e decidi in quali fasce orarie essere avvisato. Tutto dalle Preferenze dell'app.
+          </p>
+        </div>
+      </div>
+
+      <p style="margin-top: 18px; font-size: 0.9em;">
+        Grazie per usare Venezia Marea. Per segnalazioni o suggerimenti scrivici a
+        <a href="mailto:bytebustersdev@gmail.com">bytebustersdev@gmail.com</a>.
+      </p>
+    </div>
+
+    <!-- ═══════════════════════════════════════════
+         ENGLISH CONTENT
+    ════════════════════════════════════════════ -->
+    <div data-lang="en">
+      <div class="headline">
+        <span class="news-date-tag">February 23, 2026</span>
+        <span style="font-size: 0.8em; color: var(--muted);">App updates</span>
+      </div>
+      <h1>What’s new in Venezia Marea</h1>
+
+      <div class="news-list">
+        <div class="news-card">
+          <div class="news-card-header">
+            <div class="pill">
+              <span class="pill-dot"></span>
+              <span>New</span>
+            </div>
+            <h2>Venezia Marea is now on iOS</h2>
+          </div>
+          <p>
+            Get tide forecasts right on your iPhone. A layout tuned for small screens,
+            reliable alerts and a map designed to help you move safely around the city.
+          </p>
+          <div style="margin-top: 14px; border-radius: 14px; overflow: hidden;">
+            <video
+              src="assets/venezia_marea_ios_available.mp4"
+              autoplay
+              muted
+              playsinline
+              style="width: 100%; height: auto; display: block; background: #000;"
+            ></video>
+          </div>
+        </div>
+
+        <div class="news-card">
+          <div class="news-card-header">
+            <div class="pill">
+              <span class="pill-dot"></span>
+              <span>Improvement</span>
+            </div>
+            <h2>More accurate tide forecasts</h2>
+          </div>
+          <p>
+            We’ve updated the prediction engine: data is now more precise and refreshed every hour
+            thanks to the new Venice Municipality APIs.
+          </p>
+        </div>
+
+        <div class="news-card">
+          <div class="news-card-header">
+            <div class="pill">
+              <span class="pill-dot"></span>
+              <span>Feature</span>
+            </div>
+            <h2>Customisable notifications</h2>
+          </div>
+          <p>
+            Set your own alert threshold (in centimetres) and decide in which time windows
+            you want to be warned. All from the app’s Preferences.
+          </p>
+        </div>
+      </div>
+
+      <p style="margin-top: 18px; font-size: 0.9em;">
+        Thank you for using Venezia Marea. For feedback or suggestions write to
+        <a href="mailto:bytebustersdev@gmail.com">bytebustersdev@gmail.com</a>.
+      </p>
+    </div>
+
+    <footer>
+      <p>Venezia Marea · Bytebusters</p>
+    </footer>
+  </div>
+
+  <script>
+    // ── Language detection ──────────────────────────────────────────────────
+    // Priority: 1) ?lang= URL param  2) browser locale  3) default 'it'
+    function detectLang() {
+      const param = new URLSearchParams(window.location.search).get('lang');
+      if (param === 'it' || param === 'en') return param;
+      const browser = (navigator.language || navigator.userLanguage || 'it').toLowerCase();
+      return browser.startsWith('en') ? 'en' : 'it';
+    }
+
+    function setLang(lang) {
+      document.querySelectorAll('[data-lang]').forEach(el => {
+        el.classList.toggle('visible', el.dataset.lang === lang);
+      });
+      document.getElementById('btn-it').classList.toggle('active', lang === 'it');
+      document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+      document.documentElement.lang = lang;
+
+      // Update URL param without reloading (useful if the app reads the URL)
+      const url = new URL(window.location.href);
+      url.searchParams.set('lang', lang);
+      history.replaceState(null, '', url.toString());
+    }
+
+    // ── Expose news-id to the app via JS (optional, in addition to <meta>) ──
+    // The Flutter WebView can call: window.getNewsId() via evaluateJavascript
+    window.getNewsId = function () {
+      return document.querySelector('meta[name="news-id"]').content;
+    };
+
+    // ── Init ────────────────────────────────────────────────────────────────
+    setLang(detectLang());
+  </script>
+
+</body>
+</html>
