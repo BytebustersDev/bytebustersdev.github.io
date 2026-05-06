@@ -1,0 +1,60 @@
+---
+description: Conventions for editing venezia-marea/news.html – news cards, pills, images and release structure
+globs: venezia-marea/news.html
+alwaysApply: false
+---
+
+# News Page Conventions
+
+## When adding a new release
+
+1. Bump `<meta name="news-id" content="YYYY-MM-DD">` to the release date.
+2. Update both date tags (`data-lang="it"` and `data-lang="en"`).
+3. Insert new cards **at the top** of each language section (IT first, EN second — identical structure).
+4. Push old cards below a `<div class="release-divider">` separator.
+
+## Card anatomy
+
+```html
+<div class="news-card [news-card-featured]">
+  <div class="news-card-header">
+    <div class="pill [pill-fix|pill-improvement]">
+      <span class="pill-dot"></span>
+      <span>Label</span>
+    </div>
+    <h2>Section title</h2>
+  </div>
+
+  <!-- single-line entry -->
+  <p>Description text.</p>
+
+  <!-- OR multi-item entry -->
+  <ul class="news-bullet-list">
+    <li>Item one</li>
+    <li>Item two</li>
+  </ul>
+
+  <!-- optional screenshot — drop inside the card, after the text/list -->
+  <div style="margin-top: 16px; border-radius: 16px; overflow: hidden; max-width: 100%;">
+    <img src="assets/filename.png" alt="Description"
+         style="width: 100%; height: auto; display: block; object-fit: cover;" />
+  </div>
+</div>
+```
+
+## Pill variants
+
+| Class | Colour | Use for |
+|---|---|---|
+| *(default)* | Blue | New features |
+| `pill-fix` | Orange | Bug fixes |
+| `pill-improvement` | Purple | Improvements / refactors |
+
+Use `news-card-featured` on the card that has the most items or includes a screenshot.
+
+## Rules
+
+- **No emoji icons** in card headers — no `<span class="section-icon">` elements.
+- Card images live in `venezia-marea/assets/` and are referenced as `assets/filename`.
+- Always duplicate cards in both IT and EN sections; keep wording consistent.
+- Do not add new CSS classes unless strictly necessary; reuse existing variants.
