@@ -66,7 +66,8 @@
   }
 
   * { box-sizing: border-box; }
-  html, body { margin: 0; height: 100%; }
+  html { background-color: var(--bg-2); }
+  body { margin: 0; }
   body {
     min-height: 100svh;
     display: flex;
@@ -76,23 +77,34 @@
     padding: max(24px, env(safe-area-inset-top)) 16px max(20px, env(safe-area-inset-bottom));
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     color: var(--ink);
-    background:
-      radial-gradient(120% 70% at 90% 0%, var(--wash-2), transparent 60%),
-      radial-gradient(100% 65% at 0% 100%, var(--wash-1), transparent 62%),
-      linear-gradient(165deg, var(--bg-1), var(--bg-2));
-    background-color: var(--bg-2);
-    background-attachment: fixed;
     overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
     -webkit-tap-highlight-color: transparent;
   }
 
+  /* Sfondo fisso: copre anche la zona sotto le barre di Safari */
+  body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 100lvh;
+    z-index: -1;
+    background:
+      radial-gradient(120% 70% at 90% 0%, var(--wash-2), transparent 60%),
+      radial-gradient(100% 65% at 0% 100%, var(--wash-1), transparent 62%),
+      linear-gradient(165deg, var(--bg-1), var(--bg-2));
+    pointer-events: none;
+  }
+
   /* Linee di trasporto sullo sfondo, nei colori dell'app */
   .lines {
     position: fixed;
-    inset: 0;
+    top: 0;
+    left: 0;
     width: 100%;
-    height: 100%;
+    height: 100lvh;
     z-index: 0;
     pointer-events: none;
     opacity: var(--line-alpha);
@@ -304,6 +316,20 @@
     .card { padding: 44px 36px 32px; }
     h1 { font-size: 40px; }
     .logo { width: 108px; height: 108px; }
+  }
+  @media (max-height: 760px) and (max-width: 719px) {
+    body { padding-top: max(14px, env(safe-area-inset-top)); padding-bottom: max(14px, env(safe-area-inset-bottom)); }
+    .card { padding: 24px 20px 20px; }
+    .logo { width: 76px; height: 76px; margin-bottom: 12px; }
+    h1 { font-size: 30px; }
+    .tag { font-size: 15px; margin-top: 6px; }
+    .status { margin-top: 16px; }
+    .stores { margin-top: 18px; gap: 10px; }
+    .store { min-height: 56px; padding: 10px 18px; }
+    .mobile .store.other { min-height: 50px; padding: 8px 18px; }
+    .features { margin-top: 18px; gap: 6px; }
+    .features li { padding: 6px 10px; font-size: 12.5px; }
+    footer { margin-top: 14px; }
   }
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation-duration: .01ms !important; animation-delay: 0s !important; }
